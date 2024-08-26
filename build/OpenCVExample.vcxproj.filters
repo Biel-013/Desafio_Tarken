@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Administrador\Documents\Pessoal\Programação\C++\Processamento de imagem\PDI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Administrador\Documents\Pessoal\Programação\C++\Processamento de imagem\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F18DBC50-6C12-3BB1-B5A8-1F687633DE64}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

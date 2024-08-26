@@ -1,0 +1,3 @@
+C:/Users/Administrador/Documents/Pessoal/Programação/C++/Processamento de imagem/build/CMakeFiles/OpenCVExample.dir
+C:/Users/Administrador/Documents/Pessoal/Programação/C++/Processamento de imagem/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Administrador/Documents/Pessoal/Programação/C++/Processamento de imagem/build/CMakeFiles/ZERO_CHECK.dir
