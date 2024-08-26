@@ -13,77 +13,63 @@ int main(int argc, char **argv)
         std::cerr << "Erro ao carregar a imagem!" << std::endl;
         return -1;
     }
-    /************************Clean image**************************/
-    cv::Vec3b pixelWhite(255, 255, 255);
-    for (int y = 0; y < image.rows; y++)
-    {
-        for (int x = 0; x < image.cols; x++)
-        {
-            if (image.at<cv::Vec3b>(y, x)[0] == pixelWhite[0] &&
-                image.at<cv::Vec3b>(y, x)[1] == pixelWhite[1] &&
-                image.at<cv::Vec3b>(y, x)[2] == pixelWhite[2])
-            {
-                image.at<cv::Vec3b>(y, x) = cv::Vec3b(189, 119, 2);
-            }
-        }
-    }
-    cv::imwrite("Clean_image.png", image);
-    /************************Clean image**************************/
-    cv::Vec3b pixelRed(0, 0, 255);
-    cv::Vec3b pixelBlue(255, 0, 0);
-    cv::Vec3b pixelYellow(0, 255, 255);
 
-    for (int y = 0; y < image.rows; y++)
+    cv::Mat Image_grey;
+    cv::Mat Image_mask;
+
+    // Converter a imagem para escala de cinza
+    cv::cvtColor(image, Image_grey, cv::COLOR_BGR2GRAY);
+
+    // Definir os limites para a máscara
+    uchar lowerThreshold = 80;  // Valor mínimo
+    uchar upperThreshold = 150; // Valor máximo
+
+    // Criar a máscara usando a escala de cinza
+    cv::inRange(Image_grey, lowerThreshold, upperThreshold, Image_mask);
+
+    // Vetor para armazenar cores únicas detectadas
+    std::vector<cv::Vec3b> cores;
+
+    for (int y = 0; y < Image_grey.rows; y++)
     {
-        for (int x = 0; x < image.cols; x++)
+        for (int x = 0; x < Image_grey.cols; x++)
         {
-            if (image.at<cv::Vec3b>(y, x)[0] == pixelRed[0] &&
-                image.at<cv::Vec3b>(y, x)[1] == pixelRed[1] &&
-                image.at<cv::Vec3b>(y, x)[2] == pixelRed[2])
+            uchar pixelValue = Image_grey.at<uchar>(y, x);
+
+            // Verificar se o pixel está na faixa da máscara
+            if (Image_mask.at<uchar>(y, x) == 255)
             {
-                for (int i = y; i < image.rows; i++)
+                // Criar a cor correspondente
+                cv::Vec3b detectedColor = image.at<cv::Vec3b>(y, x);
+
+                // Verificar se a cor já está na lista
+                bool found = false;
+                for (const auto& color : cores)
                 {
-                    image.at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
-                    if (image.at<cv::Vec3b>(i, x)[0] == pixelBlue[0] &&
-                        image.at<cv::Vec3b>(i, x)[1] == pixelBlue[1] &&
-                        image.at<cv::Vec3b>(i, x)[2] == pixelBlue[2])
+                    if (color == detectedColor)
                     {
-                        Meteor_cont++;
-                        image.at<cv::Vec3b>(y, x) = cv::Vec3b(0, 255, 255);
+                        found = true;
                         break;
                     }
                 }
+
+                // Se a cor não estiver na lista, adicione-a
+                if (!found)
+                {
+                    cores.push_back(detectedColor);
+                    std::cout << "Cor detectada:\n B: " << (int) detectedColor[0]
+                              << " G: " << (int) detectedColor[1]
+                              << " R: " << (int) detectedColor[2] << std::endl;
+                }
             }
         }
     }
 
-    for (int y = 0; y < image.rows; y++)
-    {
-        for (int x = 0; x < image.cols; x++)
-        {
-            if (image.at<cv::Vec3b>(y, x)[0] == pixelWhite[0] &&
-                image.at<cv::Vec3b>(y, x)[1] == pixelWhite[1] &&
-                image.at<cv::Vec3b>(y, x)[2] == pixelWhite[2])
-            {
-                for (int i = y; i < image.rows; i++)
-                {
-                    image.at<cv::Vec3b>(i, x) = cv::Vec3b(0, 0, 255);
-                }
-            }
-            if (image.at<cv::Vec3b>(y, x)[0] == pixelYellow[0] &&
-                image.at<cv::Vec3b>(y, x)[1] == pixelYellow[1] &&
-                image.at<cv::Vec3b>(y, x)[2] == pixelYellow[2])
-            {
-                for (int i = y; i < image.rows; i++)
-                {
-                    image.at<cv::Vec3b>(i, x) = cv::Vec3b(0, 255, 0);
-                }
-            }
-        }
-    }
-    std::cout << "O numero de meteoros na agua e: " << Meteor_cont << std::endl;
-    cv::imwrite("caminho_meteor.png", image);
-    // cv::imshow("image window", image);
-    // cv::waitKey(0);
+    // Exibir as imagens se necessário
+    // cv::imshow("Image", image);
+    cv::imshow("Image Grey", Image_grey);
+    cv::imshow("Image Mask", Image_mask);
+    cv::waitKey(0);
+
     return 0;
 }
