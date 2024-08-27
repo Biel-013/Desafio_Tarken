@@ -1,11 +1,15 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/utils/logger.hpp>
 
 int main(int argc, char **argv)
 {
+    cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_SILENT);
+
     std::string imagePATH = "meteor_challenge_01.png";
     int Star_cont = 0;
     int Meteor_cont = 0;
+    int lines = 0;
     cv::Mat image = cv::imread(imagePATH, cv::IMREAD_COLOR);
 
     if (image.empty())
@@ -14,62 +18,49 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    cv::Mat Image_grey;
-    cv::Mat Image_mask;
-
-    // Converter a imagem para escala de cinza
-    cv::cvtColor(image, Image_grey, cv::COLOR_BGR2GRAY);
-
-    // Definir os limites para a máscara
-    uchar lowerThreshold = 80;  // Valor mínimo
-    uchar upperThreshold = 150; // Valor máximo
-
-    // Criar a máscara usando a escala de cinza
-    cv::inRange(Image_grey, lowerThreshold, upperThreshold, Image_mask);
+    cv::Vec3b pixelWhite(255, 255, 255);
+    cv::Vec3b pixelRed(0, 0, 255);
+    cv::Vec3b pixelBlue(255, 0, 0);
+    cv::Vec3b pixelYellow(0, 255, 255);
+    cv::Vec3b pixelBackground(189, 119, 2);
+    cv::Mat image_test(352, 704, CV_8UC3, pixelBackground);
 
     // Vetor para armazenar cores únicas detectadas
-    std::vector<cv::Vec3b> cores;
-
-    for (int y = 0; y < Image_grey.rows; y++)
+    std::vector<int> binari;
+    int i = 0;
+    for (int y = 0; y < 352; y++)
     {
-        for (int x = 0; x < Image_grey.cols; x++)
+        i = 0;
+        for (int x = 0; x < image.cols; x++)
         {
-            uchar pixelValue = Image_grey.at<uchar>(y, x);
+            // Criar a cor correspondente
+            cv::Vec3b detectedColor = image.at<cv::Vec3b>(y, x);
 
-            // Verificar se o pixel está na faixa da máscara
-            if (Image_mask.at<uchar>(y, x) == 255)
+            if (image.at<cv::Vec3b>(y, x)[0] == pixelRed[0] && // Componente B
+                image.at<cv::Vec3b>(y, x)[1] == pixelRed[1] && // Componente G
+                image.at<cv::Vec3b>(y, x)[2] == pixelRed[2])
             {
-                // Criar a cor correspondente
-                cv::Vec3b detectedColor = image.at<cv::Vec3b>(y, x);
+                image_test.at<cv::Vec3b>(y, x) = pixelRed;
+            }
 
-                // Verificar se a cor já está na lista
-                bool found = false;
-                for (const auto& color : cores)
-                {
-                    if (color == detectedColor)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                // Se a cor não estiver na lista, adicione-a
-                if (!found)
-                {
-                    cores.push_back(detectedColor);
-                    std::cout << "Cor detectada:\n B: " << (int) detectedColor[0]
-                              << " G: " << (int) detectedColor[1]
-                              << " R: " << (int) detectedColor[2] << std::endl;
-                }
+            if (image.at<cv::Vec3b>(y, x)[0] == pixelWhite[0] && // Componente B
+                image.at<cv::Vec3b>(y, x)[1] == pixelWhite[1] && // Componente G
+                image.at<cv::Vec3b>(y, x)[2] == pixelWhite[2])
+            {
+                image_test.at<cv::Vec3b>(y, x) = pixelWhite;
             }
         }
     }
-
+    for (auto& binario : binari)
+    {
+    std::cout << binario;
+    }
+    std::cout << std::endl;
     // Exibir as imagens se necessário
     // cv::imshow("Image", image);
-    cv::imshow("Image Grey", Image_grey);
-    cv::imshow("Image Mask", Image_mask);
-    cv::waitKey(0);
+    // cv::imshow("Image test", image_test);
+    cv::imwrite("Image_test.png", image_test);
+    // cv::waitKey(0);
 
     return 0;
 }
