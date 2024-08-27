@@ -1,50 +1,49 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/utils/logger.hpp>
 
 int main(int argc, char **argv)
 {
-    std::string imagePATH = "meteor_challenge_01.png";
+    /* Silencia as mensagens de retorno do OpenCV*/
+    cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_SILENT);
+
+    /* Cria os contadores para armazenar o numero máximo de estrelas e meteoros*/
     int Star_cont = 0;
     int Meteor_cont = 0;
+
+    /* Cria o objeto "image", que será basicamente uma matrix onde cada índice apresenta um valor BGR*/
+    std::string imagePATH = "meteor_challenge_01.png";
     cv::Mat image = cv::imread(imagePATH, cv::IMREAD_COLOR);
 
+    /* Verifica se não houve erro na instanciação do objeto*/
     if (image.empty())
     {
         std::cerr << "Erro ao carregar a imagem!" << std::endl;
         return -1;
     }
 
-    cv::Vec3b pixelWhite(255, 255, 255);
-    cv::Vec3b pixelRed(0, 0, 255);
+    /* Variáveis que armazenam o valor dos pixels da estrela (Branco) e meteoro (Vermelho)*/
+    cv::Vec3b pixelWhite(255, 255, 255); // BGR: Blue(255), Green(255), Red(255)
+    cv::Vec3b pixelRed(0, 0, 255); // BGR: Blue(0), Green(0), Red(255)
 
-    for (int i = 0; i < image.rows; i++)
+    /* Laço duplo for para percorrer todos os índices da imagem*/
+    for (int row = 0; row < image.rows; row++)
     {
-        for (int j = 0; j < image.cols; j++)
+        for (int col = 0; col < image.cols; col++)
         {
-            
-            if (image.at<cv::Vec3b>(i, j)[0] == pixelWhite[0] && // Componente B
-                image.at<cv::Vec3b>(i, j)[1] == pixelWhite[1] && // Componente G
-                image.at<cv::Vec3b>(i, j)[2] == pixelWhite[2])
-            { 
+            /* Para cada pixel, a cor será armazenada e logo após comparada, para verificar 
+            se é um meteoro ou uma estrela */
+            cv::Vec3b detectColor = image.at<cv::Vec3b>(row, col);
 
-                std::cout << "Estrela encontrado em (" << i << ", " << j << ")" << std::endl;
-                image.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 255, 0); // B=255, G=0, R=0
+            if (detectColor == pixelWhite)
                 Star_cont++;
-            }
 
-            if (image.at<cv::Vec3b>(i, j)[0] == pixelRed[0] &&
-                image.at<cv::Vec3b>(i, j)[1] == pixelRed[1] && 
-                image.at<cv::Vec3b>(i, j)[2] == pixelRed[2])
-            {
-
-                std::cout << "Meteoro encontrado em (" << i << ", " << j << ")" << std::endl;
+            if (detectColor == pixelRed)
                 Meteor_cont++;
-            }
         }
     }
-    std::cout << "O numero de meteoros e: " << Meteor_cont << "\nE o numero de estrelas e: " << Star_cont << std::endl;
-    // cv::imwrite("imagem_alterada.png", image);
-    // cv::imshow("image window", image);
-    // cv::waitKey(0);
+
+    /* Exibe o valor da contagem de estrelas e meteoros*/
+    std::cout << "O numero de estrelas e: " << Star_cont << "\nE o numero de meteoros e: " << Meteor_cont << std::endl;
     return 0;
 }
