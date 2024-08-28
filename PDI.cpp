@@ -7,9 +7,7 @@ int main(int argc, char **argv)
     /* Silencia as mensagens de retorno do OpenCV*/
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_SILENT);
 
-    /* Cria os contadores para armazenar o numero máximo de estrelas e
-     meteoros*/
-    int Star_cont = 0;
+    /* Cria o contador para armazenar o numero de meteoros na agua*/
     int Meteor_cont = 0;
 
     /* Cria o objeto "image", que será basicamente uma matrix onde cada
