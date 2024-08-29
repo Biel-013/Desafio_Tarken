@@ -27,40 +27,37 @@ int main(int argc, char **argv)
 
     // Vetor para armazenar cores únicas detectadas
     std::vector<int> binari;
-    int i = 0;
-    for (int y = 0; y < 352; y++)
+    for (int y = 0; y < 222; y++)
     {
-        i = 0;
         for (int x = 0; x < image.cols; x++)
         {
             // Criar a cor correspondente
             cv::Vec3b detectedColor = image.at<cv::Vec3b>(y, x);
 
-            if (image.at<cv::Vec3b>(y, x)[0] == pixelRed[0] && // Componente B
-                image.at<cv::Vec3b>(y, x)[1] == pixelRed[1] && // Componente G
-                image.at<cv::Vec3b>(y, x)[2] == pixelRed[2])
+            if (detectedColor == pixelRed)
             {
                 image_test.at<cv::Vec3b>(y, x) = pixelRed;
+                binari.push_back(1);
+                binari.push_back(0);
+                binari.push_back(0);
             }
 
-            if (image.at<cv::Vec3b>(y, x)[0] == pixelWhite[0] && // Componente B
-                image.at<cv::Vec3b>(y, x)[1] == pixelWhite[1] && // Componente G
-                image.at<cv::Vec3b>(y, x)[2] == pixelWhite[2])
+            if (detectedColor == pixelWhite)
             {
                 image_test.at<cv::Vec3b>(y, x) = pixelWhite;
+                binari.push_back(1);
+                binari.push_back(1);
+                binari.push_back(1);
             }
         }
     }
-    for (auto& binario : binari)
-    {
-    std::cout << binario;
-    }
-    std::cout << std::endl;
-    // Exibir as imagens se necessário
-    // cv::imshow("Image", image);
-    // cv::imshow("Image test", image_test);
-    cv::imwrite("Image_test.png", image_test);
-    // cv::waitKey(0);
 
+    char phase[175] = {0};
+    for (int i = 0; i < (binari.size() / 8); i++)
+    {
+        phase[i] = (binari[i * 8] << 0) + (binari[i * 8 + 1] << 1) + (binari[i * 8 + 2] << 2) + (binari[i * 8 + 3] << 3) + (binari[i * 8 + 4] << 4) + (binari[i * 8 + 5] << 5) + (binari[i * 8 + 6] << 6) + (binari[i * 8 + 7] << 7);
+    }
+    // phase[binari.size()] = '\0';
+    std::cout << phase << std::endl;
     return 0;
 }

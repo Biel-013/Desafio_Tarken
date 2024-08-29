@@ -9,3 +9,14 @@ events:
     message: |
       The system is: Windows - 10.0.22621 - 
 ...
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "A:/Program Files/CMake/share/cmake-3.30/Modules/CMakeDetermineSystem.cmake:205 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The system is: Windows - 10.0.22631 - 
+...
