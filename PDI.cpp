@@ -22,42 +22,61 @@ int main(int argc, char **argv)
     cv::Vec3b pixelRed(0, 0, 255);
     cv::Vec3b pixelBlue(255, 0, 0);
     cv::Vec3b pixelYellow(0, 255, 255);
-    cv::Vec3b pixelBackground(189, 119, 2);
-    cv::Mat image_test(352, 704, CV_8UC3, pixelBackground);
+
+    cv::Mat image_filter(500, 500, CV_8UC3, cv::Scalar(0, 0, 0));
+    cv::Mat image_color(520, 500, CV_8UC3, cv::Scalar(0, 0, 0));
 
     // Vetor para armazenar cores únicas detectadas
     std::vector<int> binari;
-    for (int y = 0; y < 222; y++)
+    int pixels = 0;
+    binari.clear();
+    for (int row = 0; row < 350; row++)
     {
-        for (int x = 0; x < image.cols; x++)
+        for (int col = 0; col < image.cols; col++)
         {
-            // Criar a cor correspondente
-            cv::Vec3b detectedColor = image.at<cv::Vec3b>(y, x);
+            /* Variável para armazenamento do valor do píxel*/
+            cv::Vec3b detectColor = image.at<cv::Vec3b>(row, col);
 
-            if (detectedColor == pixelRed)
-            {
-                image_test.at<cv::Vec3b>(y, x) = pixelRed;
-                binari.push_back(1);
-                binari.push_back(0);
-                binari.push_back(0);
-            }
+            /* Essa variável armazena se o meteoro caiu ou não na água*/
+            bool inOcean = false;
 
-            if (detectedColor == pixelWhite)
+            if (detectColor == pixelWhite)
+                std::cout << 1;
+
+            /* Se um píxel vermelho for detectado, percorre um caminho
+            perpendicular até a água para verificar se o meteoro irá cair
+            no oceano ou não*/
+            if (detectColor == pixelRed)
             {
-                image_test.at<cv::Vec3b>(y, x) = pixelWhite;
-                binari.push_back(1);
-                binari.push_back(1);
-                binari.push_back(1);
+                for (int pathway = row; pathway < image.rows; pathway++)
+                {
+                    detectColor = image.at<cv::Vec3b>(pathway, col);
+
+                    if (detectColor == pixelBlue)
+                    {
+                        std::cout << 0;
+                        break;
+                    }
+                }
+
+                /* Caso o meteoro caia no oceano, esse novo laço irá desenhar um
+                caminho verde até o mar*/
+                // if (inOcean)
+                //     std::cout << 0;
+                /* Caso contrário, irá desenhar um caminho vermelho*/
             }
         }
+        std::cout << std::endl;
     }
+    // for (int i = 0; i < binari.size(); i++)
+    // {
+    //     std::cout << binari[i];
+    //     if ((i % 20) == 19)
+    //         std::cout << std::endl;
+    // }
+    std::cout << std::endl;
 
-    char phase[175] = {0};
-    for (int i = 0; i < (binari.size() / 8); i++)
-    {
-        phase[i] = (binari[i * 8] << 0) + (binari[i * 8 + 1] << 1) + (binari[i * 8 + 2] << 2) + (binari[i * 8 + 3] << 3) + (binari[i * 8 + 4] << 4) + (binari[i * 8 + 5] << 5) + (binari[i * 8 + 6] << 6) + (binari[i * 8 + 7] << 7);
-    }
-    // phase[binari.size()] = '\0';
-    std::cout << phase << std::endl;
+    // cv::imshow("image_color", image_color);
+    // cv::waitKey(0);
     return 0;
 }
